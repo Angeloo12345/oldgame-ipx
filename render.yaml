@@ -1,0 +1,12 @@
+# Render.com Blueprint — náš vlastní IPX relay pro multiplayer na oldgame.cz.
+# Free plán, bez kreditky. Render terminuje TLS sám (wss na 443) a pošle $PORT.
+services:
+  - type: web
+    name: oldgame-ipx
+    runtime: go
+    plan: free
+    region: frankfurt          # nejblíž k CZ hráčům
+    rootDir: src
+    buildCommand: go build -o relay .
+    startCommand: ./relay
+    healthCheckPath: /
