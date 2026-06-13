@@ -77,6 +77,12 @@ func main() {
 	}
 
 	http.HandleFunc("/ipx/", ipxWebSocket)
+	// /rooms = monitoring: JSON {místnost: počet_klientů} (kolik hráčů je v které místnosti)
+	http.HandleFunc("/rooms", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Write([]byte(ipxHandler.Stats()))
+	})
 	// Root = health check (for the PaaS) + keep-alive ping target (anti-sleep).
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/plain")

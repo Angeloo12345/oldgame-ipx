@@ -3,10 +3,31 @@ package main
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
+	"strings"
 	"sync"
 
 	"github.com/gorilla/websocket"
 )
+
+// Stats vrátí JSON {room: pocet_klientu} — pro monitoring /rooms.
+func (handler *IpxHandler) Stats() string {
+	var sb strings.Builder
+	sb.WriteString("{")
+	first := true
+	handler.rooms.Range(func(k, v interface{}) bool {
+		n := 0
+		v.(*IpxRoom).clients.Range(func(_, _ interface{}) bool { n++; return true })
+		if !first {
+			sb.WriteString(",")
+		}
+		first = false
+		sb.WriteString(fmt.Sprintf("%q:%d", k.(string), n))
+		return true
+	})
+	sb.WriteString("}")
+	return sb.String()
+}
 
 type IpxHandler struct {
 	rooms         sync.Map
