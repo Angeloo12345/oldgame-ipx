@@ -1,0 +1,14 @@
+name: keepalive
+# Drží Render free instanci vzhůru (usíná po ~15 min nečinnosti → 1. připojení by jinak čekalo ~25 s).
+# Pinguje sám sebe. Zdarma, žádný extra účet. Pozn.: GitHub cron je „best effort" (občas zpoždění),
+# play.php má i tak fallback retry s hláškou „⏳ Probouzím server…".
+on:
+  schedule:
+    - cron: '*/10 * * * *'   # cca každých 10 min
+  workflow_dispatch: {}        # + ruční spuštění z GitHubu
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping relay
+        run: curl -fsS --max-time 80 --retry 2 https://oldgame-ipx.onrender.com/ || true
