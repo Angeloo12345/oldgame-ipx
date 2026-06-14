@@ -77,11 +77,19 @@ func main() {
 	}
 
 	http.HandleFunc("/ipx/", ipxWebSocket)
+	// /serial/ = raw byte-pipe pro null-modem hry bez IPX (Wacky Wheels, IndyCar…)
+	http.HandleFunc("/serial/", serialWebSocket)
 	// /rooms = monitoring: JSON {místnost: počet_klientů} (kolik hráčů je v které místnosti)
 	http.HandleFunc("/rooms", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Write([]byte(ipxHandler.Stats()))
+	})
+	// /serial-rooms = počty hráčů u sériových her
+	http.HandleFunc("/serial-rooms", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Write([]byte(serialHandler.Stats()))
 	})
 	// Root = health check (for the PaaS) + keep-alive ping target (anti-sleep).
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
