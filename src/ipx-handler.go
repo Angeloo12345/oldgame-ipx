@@ -77,20 +77,16 @@ func (handler *IpxHandler) OnMessage(conn *websocket.Conn, room string, data []b
 		}
 		clients := ipxRoom.(*IpxRoom).clients
 
-		if header.Dest.Host == 0xffffffff {
-			// broadcast
-			clients.Range(func(address, dest interface{}) bool {
-				if conn != dest {
-					dest.(*websocket.Conn).WriteMessage(websocket.BinaryMessage, data)
-				}
-				return true
-			})
-		} else {
-			dest, ok := clients.Load(header.Dest.Address())
-			if ok {
+		// HUB režim (oldgame): v malé místnosti (1v1 / pár hráčů) pošli KAŽDÝ paket — broadcast i směrovaný —
+		// všem OSTATNÍM klientům; hra si pakety nesměřované na svou IPX adresu sama odfiltruje.
+		// Řeší rozbité address-routing (RemoteAddr na Render proxy/IPv6 se neshoduje s Dest.Address()),
+		// kvůli kterému se IPXSETUP handshake (broadcast discovery + SMĚROVANÁ odpověď) nedokončil → „Searching".
+		clients.Range(func(address, dest interface{}) bool {
+			if conn != dest {
 				dest.(*websocket.Conn).WriteMessage(websocket.BinaryMessage, data)
 			}
-		}
+			return true
+		})
 	}
 }
 
