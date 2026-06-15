@@ -94,6 +94,9 @@ func main() {
 	// /presence + /players = jména hráčů v místnosti (kdo s kým hraje)
 	http.HandleFunc("/presence", presenceHandler)
 	http.HandleFunc("/players", playersHandler)
+	// /msg + /msgs = chat při hře v místnosti
+	http.HandleFunc("/msg", chatPostHandler)
+	http.HandleFunc("/msgs", chatGetHandler)
 	// Root = health check (for the PaaS) + keep-alive ping target (anti-sleep).
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/plain")
