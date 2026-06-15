@@ -91,6 +91,9 @@ func main() {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Write([]byte(serialHandler.Stats()))
 	})
+	// /presence + /players = jména hráčů v místnosti (kdo s kým hraje)
+	http.HandleFunc("/presence", presenceHandler)
+	http.HandleFunc("/players", playersHandler)
 	// Root = health check (for the PaaS) + keep-alive ping target (anti-sleep).
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/plain")
